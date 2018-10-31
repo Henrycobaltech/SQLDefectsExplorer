@@ -23,5 +23,3 @@
 /dist/
 /nbdist/
 /.nb-gradle/
-
-/defects-explorer/src/main/resources/static/**
