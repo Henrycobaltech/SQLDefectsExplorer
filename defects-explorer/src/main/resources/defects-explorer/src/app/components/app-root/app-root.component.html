@@ -1,0 +1,8 @@
+<mat-sidenav-container>
+  <mat-sidenav mode="side" opened>
+    <mat-list *ngFor="let pr of pullRequests">
+      <pull-request-list-item [pullRequest]="pr"></pull-request-list-item>
+    </mat-list>
+  </mat-sidenav>
+  <mat-sidenav-content>Prs</mat-sidenav-content>
+</mat-sidenav-container>
