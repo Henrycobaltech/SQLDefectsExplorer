@@ -135,44 +135,46 @@ class Dashboard extends React.Component {
     };
     setValue = (value,resource) => {
         this.setState(state => ({ show_resource: resource ,show_content: value }));
-        this.forceUpdate();
+        //this.forceUpdate();
     }
     handleChange = event => {
         this.setState({ value: event.target.value });
     };
     handleDelete = (id,source) =>{
-        if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
-        else
-            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
-
-        const myRequest = new Request(url, {method: 'POST'});
-
-        fetch(myRequest)
-            .then(response => {
-            if (response.status === 200) {
-                alert("Delete Sucessfully")
-            } else {
-                alert("Can't delete , server error")
-            }
-        })
+        console.log(1)
+        // if(source==='GitHub')
+        //     var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
+        // else
+        //     var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
+        //
+        // const myRequest = new Request(url, {method: 'POST'});
+        //
+        // fetch(myRequest)
+        //     .then(response => {
+        //     if (response.status === 200) {
+        //         alert("Delete Sucessfully")
+        //     } else {
+        //         alert("Can't delete , server error")
+        //     }
+        // })
     }
-    handleSave= (id,type=this.state.selected_value) =>{
-        if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
-        else
-            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
-
-        const myRequest = new Request(url, {method: 'POST'});
-
-        fetch(myRequest)
-            .then(response => {
-                if (response.status === 200) {
-                    alert("Select Sucessfully")
-                } else {
-                    alert("Can't select , server error")
-                }
-            })
+    handleSave= (id,source) =>{
+        var type=this.state.selected_value
+        // if(source==='GitHub')
+        //     var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
+        // else
+        //     var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
+        //
+        // const myRequest = new Request(url, {method: 'POST'});
+        //
+        // fetch(myRequest)
+        //     .then(response => {
+        //         if (response.status === 200) {
+        //             alert("Select Sucessfully")
+        //         } else {
+        //             alert("Can't select , server error")
+        //         }
+        //     })
     }
     handleNext=(source,id)=>{
         if (source==="GitHub"){
@@ -182,8 +184,6 @@ class Dashboard extends React.Component {
         }
     }
     showContent = (content,source,classes) => {
-
-
         if(source === 'GitHub'){
             return(
                 <div>
@@ -229,15 +229,15 @@ class Dashboard extends React.Component {
                         <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
                     </RadioGroup>
 
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id,'GitHub')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content._id,'GitHub')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id,'GitHub')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content._id,'GitHub')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
-                    <Button variant="contained"  size = "large"className={classes.button} onclick = {this.handleNext(source,content._id)}>
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() => this.handleNext(source,content._id)}>
                         Next
                     </Button>
 
@@ -277,15 +277,15 @@ class Dashboard extends React.Component {
                         <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
                     </RadioGroup>
 
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id,'StackOverflow')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content._id,'StackOverflow')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id,'StackOverflow')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content._id,'StackOverflow')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
-                    <Button variant="contained"  size = "large"className={classes.button} onclick = {this.handleNext(source,content._id)}>
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() =>this.handleNext(source,content._id)}>
                         Next
                     </Button>
                 </div>
@@ -332,11 +332,6 @@ class Dashboard extends React.Component {
                             >
                                 Label Platform
                             </Typography>
-                            {/*<IconButton color="inherit">*/}
-                                {/*<Badge badgeContent={4} color="secondary">*/}
-                                    {/*<NotificationsIcon />*/}
-                                {/*</Badge>*/}
-                            {/*</IconButton>*/}
                         </Toolbar>
                     </AppBar>
 

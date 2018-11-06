@@ -71,7 +71,7 @@ class StackOverflow extends Component {
         selectedPr: null
     }
     componentDidMount() {
-        fetch("http://localhost:8080/so-qa-pages/")
+        fetch("http://localhost:8080/so-qa-pages")
             .then(res => res.json())
             .then(prs => this.setState({ ques: prs }));
     }
@@ -103,8 +103,8 @@ class StackOverflow extends Component {
                 <List>
                     {
                         this.state.ques.map(pr =>
-                            <ListItem button key={pr.id} onClick={this.selectPr(pr)}>
-                                <ListItemText primary={pr.ques_title}  />
+                            <ListItem button key={pr._id} onClick={this.selectPr(pr)}>
+                                <ListItemText primary={pr.title}  />
                             </ListItem>
                         )
                     }

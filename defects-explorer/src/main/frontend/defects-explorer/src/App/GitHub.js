@@ -25,7 +25,6 @@ class GitHub extends Component {
           this.setState({
               selectedPr: pr
           }, function () {
-
               this.props.setValue(pr, "GitHub");
           });
       }
