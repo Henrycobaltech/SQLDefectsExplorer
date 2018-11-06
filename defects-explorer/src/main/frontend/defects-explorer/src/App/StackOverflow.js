@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { CssBaseline, Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography } from '@material-ui/core';
+import {  List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
 
-const drawerWidth = 350;
+
 const a = [{
     "_id" : "5bd18c5dff0c64ead7ea442c",
     "ques_title" : "What is a tensorflow float ref?",
@@ -67,12 +67,14 @@ const a = [{
 class StackOverflow extends Component {
 
     state = {
-        ques: a,
+        ques: [],
         selectedPr: null
     }
-    // componentDidMount() {
-    //     //     this.setState({ques: a})
-    //     // }
+    componentDidMount() {
+        fetch("http://localhost:8080/so-qa-pages/")
+            .then(res => res.json())
+            .then(prs => this.setState({ ques: prs }));
+    }
 
     selectPr(pr) {
         return () => {

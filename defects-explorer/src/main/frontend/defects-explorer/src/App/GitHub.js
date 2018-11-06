@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { CssBaseline, Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography } from '@material-ui/core';
+import { List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
 
-const drawerWidth = 350;
+
 
 class GitHub extends Component {
   constructor(props) {
@@ -31,15 +31,6 @@ class GitHub extends Component {
       }
   }
 
-  // fetchNext(id){
-  //     var i = 0
-  //     for( ; i<this.state.pullRequests.length ; i++){
-  //         if(this.state.pullRequests[i]._id==id){
-  //           break;
-  //         }
-  //     }
-  //     return i+1<this.state.pullRequests.length?this.state.pullRequests[i+1]:{};
-  // }
 
   render() {
 

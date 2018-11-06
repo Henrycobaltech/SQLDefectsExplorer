@@ -140,11 +140,39 @@ class Dashboard extends React.Component {
     handleChange = event => {
         this.setState({ value: event.target.value });
     };
-    handleDelete = (id) =>{
+    handleDelete = (id,source) =>{
+        if(source==='GitHub')
+            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
+        else
+            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
 
+        const myRequest = new Request(url, {method: 'POST'});
+
+        fetch(myRequest)
+            .then(response => {
+            if (response.status === 200) {
+                alert("Delete Sucessfully")
+            } else {
+                alert("Can't delete , server error")
+            }
+        })
     }
     handleSave= (id,type=this.state.selected_value) =>{
+        if(source==='GitHub')
+            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
+        else
+            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
 
+        const myRequest = new Request(url, {method: 'POST'});
+
+        fetch(myRequest)
+            .then(response => {
+                if (response.status === 200) {
+                    alert("Select Sucessfully")
+                } else {
+                    alert("Can't select , server error")
+                }
+            })
     }
     handleNext=(source,id)=>{
         if (source==="GitHub"){
@@ -201,11 +229,11 @@ class Dashboard extends React.Component {
                         <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
                     </RadioGroup>
 
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id)}>
+                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id,'GitHub')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id)}>
+                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id,'GitHub')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
@@ -249,11 +277,11 @@ class Dashboard extends React.Component {
                         <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
                     </RadioGroup>
 
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id)}>
+                    <Button variant="contained"  className={classes.button} onclick = {this.handleDelete(content._id,'StackOverflow')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id)}>
+                    <Button variant="contained"  className={classes.button} onclick = {this.handleSave(content._id,'StackOverflow')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
