@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { CssBaseline, Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography } from '@material-ui/core';
-import './App.css';
+import { List, ListItem, ListItemText } from '@material-ui/core';
+import './GitHub.css';
 
-const drawerWidth = 350;
 
-class App extends Component {
+
+class GitHub extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,31 +17,25 @@ class App extends Component {
     fetch("http://localhost:8080/api/pull-requests")
       .then(res => res.json())
       .then(prs => this.setState({ pullRequests: prs }));
+
   }
 
   selectPr(pr) {
-    return () => this.setState({
-      selectedPr: pr
-    });
+      return () => {
+          this.setState({
+              selectedPr: pr
+          }, function () {
+
+              this.props.setValue(pr, "GitHub");
+          });
+      }
   }
 
-  mainContent() {
-    if (this.state.selectedPr) {
-      return (
-        <div>{this.state.selectedPr.title}</div>
-      );
-    } else {
-      return <div>Select a PR on the left</div>;
-    }
-  }
 
   render() {
+
     return (
       <div className="app-root">
-        <CssBaseline />
-        <Drawer
-          variant="permanent"
-          anchor="left">
           <List>
             {
               this.state.pullRequests.map(pr =>
@@ -51,13 +45,9 @@ class App extends Component {
               )
             }
           </List>
-        </Drawer>
-        <main>
-          {this.mainContent()}
-        </main>
       </div>
     );
   }
 }
 
-export default App;
+export default GitHub;
