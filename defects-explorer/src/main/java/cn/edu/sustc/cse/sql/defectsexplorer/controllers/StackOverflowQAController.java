@@ -1,6 +1,6 @@
 package cn.edu.sustc.cse.sql.defectsexplorer.controllers;
 
-import cn.edu.sustc.cse.sql.defectsexplorer.persistence.PullRequestsRepository;
+import cn.edu.sustc.cse.sql.defectsexplorer.persistence.StackOverflowQARepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/pull-requests")
-public class PullRequestsController {
+@RequestMapping("/api/so-qa-pages")
+public class StackOverflowQAController {
 
-    private final PullRequestsRepository repo;
+    private final StackOverflowQARepository repo;
 
     @Autowired
-    public PullRequestsController(PullRequestsRepository repo) {
+    public StackOverflowQAController(StackOverflowQARepository repo) {
         this.repo = repo;
     }
 
@@ -30,5 +30,4 @@ public class PullRequestsController {
                 this.repo.findAll(PageRequest.of(pageIndex, pageSize)).getContent()
         );
     }
-
 }
