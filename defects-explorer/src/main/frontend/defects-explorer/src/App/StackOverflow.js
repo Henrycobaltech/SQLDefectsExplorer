@@ -1,27 +1,62 @@
 import React, { Component } from 'react';
 import {  List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
-
+import Button from "@material-ui/core/Button/Button";
+import MobileStepper from "@material-ui/core/MobileStepper/MobileStepper";
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
+import StarIcon from "@material-ui/core/SvgIcon/SvgIcon";
 
 class StackOverflow extends Component {
 
     state = {
         ques: [],
-        selectedPr: null
+        selectedPr: null,
+        // activeStep:0,
+        // totalpage:10
     }
     componentDidMount() {
-        fetch("http://localhost:8080/api/so-qa-pages?page_idx=1&page_size=10")
+        var page = this.props.pagevalue
+        // while(true) {
+        fetch('http://localhost:8080/api/so-qa-pages?page_idx='+page+'&page_size=50')
             .then(res => res.json())
-            .then(prs => this.setState({ ques: prs }));
-    }
+            .then(prs => {this.setState({ques: prs});this.props.setPage(prs)});
 
-    selectPr(pr) {
+        // }
+    }
+    // handleNext = () => {
+    //     return () => {
+    //         this.setState(state => ({
+    //             activeStep: state.activeStep + 1,
+    //         }));
+    //     }
+    //
+    // }
+    //
+    // handleBack = () => {
+    //     return () => {
+    //         this.setState(state => ({
+    //             activeStep: state.activeStep - 1,
+    //         }));
+    //     }
+    // }
+
+    selectPr(pr,index) {
         return () => {
             this.setState({
                 selectedPr: pr
             }, function () {
-                this.props.setValue(pr, "StackOverflow");
+                this.props.setValue(pr, "StackOverflow",index);
             });
+        }
+    }
+    select(pr){
+        if(pr.hasOwnProperty("category")){
+            return(
+                <ListItemIcon>
+                    <StarIcon />
+                </ListItemIcon>)
         }
     }
     /*fetchNext(id){
@@ -40,14 +75,34 @@ class StackOverflow extends Component {
             <div className="app-root">
                 <List>
                     {
-                        this.state.ques.map(pr =>
-                            <ListItem button key={pr._id} onClick={this.selectPr(pr)}>
+                        this.state.ques.map((pr,index) =>
+                            <ListItem button key={pr._id} onClick={this.selectPr(pr,index)}>
+                                {this.select(pr)}
                                 <ListItemText primary={pr.title}  />
                             </ListItem>
                         )
                     }
                 </List>
+                {/*<MobileStepper*/}
+                    {/*variant="progress"*/}
+                    {/*steps={this.state.totalpage}*/}
+                    {/*position="static"*/}
+                    {/*activeStep={this.state.activeStep}*/}
+                    {/*nextButton={*/}
+                        {/*<Button size="small" onClick={this.handleNext('S')} disabled={this.state.activeStep === this.state.totalpage}>*/}
+                            {/*Next*/}
+                            {/*<KeyboardArrowRight />*/}
+                        {/*</Button>*/}
+                    {/*}*/}
+                    {/*backButton={*/}
+                        {/*<Button size="small" onClick={this.handleBack('S')} disabled={this.state.activeStep === 0}>*/}
+                            {/*<KeyboardArrowLeft />*/}
+                            {/*Back*/}
+                        {/*</Button>*/}
+                    {/*}*/}
+                {/*/>*/}
             </div>
+
         );
     }
 }

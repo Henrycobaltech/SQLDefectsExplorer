@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
-
-
-
+import StarIcon from '@material-ui/icons/Star';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 class GitHub extends Component {
   constructor(props) {
     super(props);
@@ -14,22 +13,29 @@ class GitHub extends Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/api/pull-requests?page_idx=0&page_size=10")
+    fetch("http://localhost:8080/api/pull-requests?page_idx=0&page_size=50")
       .then(res => res.json())
-      .then(prs => this.setState({ pullRequests: prs }));
+      .then(prs => {this.setState({ pullRequests: prs });this.props.setPage(prs)});
 
   }
 
-  selectPr(pr) {
+  selectPr(pr,index) {
       return () => {
           this.setState({
               selectedPr: pr
           }, function () {
-              this.props.setValue(pr, "GitHub");
+              this.props.setValue(pr, "GitHub",index);
           });
       }
   }
-
+  select(pr){
+      if(pr.hasOwnProperty("category")){
+          return(
+          <ListItemIcon>
+              <StarIcon />
+          </ListItemIcon>)
+      }
+  }
 
   render() {
 
@@ -37,8 +43,9 @@ class GitHub extends Component {
       <div className="app-root">
           <List>
             {
-              this.state.pullRequests.map(pr =>
-                <ListItem button key={pr.id} onClick={this.selectPr(pr)}>
+              this.state.pullRequests.map((pr,index) =>
+                <ListItem button key={pr.id} onClick={this.selectPr(pr,index)} >
+                    {this.select(pr)}
                   <ListItemText primary={pr.title} secondary={pr.repoName} />
                 </ListItem>
               )
