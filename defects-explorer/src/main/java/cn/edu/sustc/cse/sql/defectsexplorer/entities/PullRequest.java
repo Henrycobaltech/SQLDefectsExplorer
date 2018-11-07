@@ -5,6 +5,28 @@ import java.util.Date;
 import java.util.List;
 
 public class PullRequest {
+    private int id;
+    private int repoId;
+    private String repoName;
+    private String title;
+    private String body;
+    private Date updatedAt;
+    private Date createdAt;
+    private int commitsCount;
+    private boolean isMerged;
+    private Date mergedAt;
+    private int issueNumber;
+    private String state;
+    private int changedFiles;
+    private String headSha;
+    private List<Comment> comments;
+    private List<String> categories;
+
+    public PullRequest(int id) {
+        this.id = id;
+        this.categories = new ArrayList<>();
+    }
+
     public int getId() {
         return id;
     }
@@ -65,24 +87,8 @@ public class PullRequest {
         return comments;
     }
 
-    private int id;
-    private int repoId;
-    private String repoName;
-    private String title;
-    private String body;
-    private Date updatedAt;
-    private Date createdAt;
-    private int commitsCount;
-    private boolean isMerged;
-    private Date mergedAt;
-    private int issueNumber;
-    private String state;
-    private int changedFiles;
-    private String headSha;
-    private List<Comment> comments;
-
-    public PullRequest(int id) {
-        this.id = id;
-        this.createdAt = new Date();
+    public List<String> getCategories() {
+        return categories;
     }
+
 }

@@ -18,9 +18,11 @@ public class StackOverflowQA {
     private int viewCount;
     private int upvotes;
     private int downvotes;
+    private List<String> categories;
 
     public StackOverflowQA() {
         this.tags = new ArrayList<>();
+        this.categories = new ArrayList<>();
     }
 
     public ObjectId getId() {
@@ -47,7 +49,6 @@ public class StackOverflowQA {
         return questionFavoriate;
     }
 
-
     public String getAnswer() {
         return answer;
     }
@@ -59,7 +60,6 @@ public class StackOverflowQA {
     public int getAnswerFavoriate() {
         return answerFavoriate;
     }
-
 
     public int getViewCount() {
         return viewCount;
@@ -73,5 +73,8 @@ public class StackOverflowQA {
         return downvotes;
     }
 
-
+    public List<String> getCategories() {
+        return categories;
+    }
+    
 }
