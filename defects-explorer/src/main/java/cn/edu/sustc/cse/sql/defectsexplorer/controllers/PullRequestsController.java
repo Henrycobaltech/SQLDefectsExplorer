@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/pull-requests")
 public class PullRequestsController {
@@ -38,33 +40,17 @@ public class PullRequestsController {
         return ResponseEntity.ok(result.get());
     }
 
-    @PostMapping("{id}/categories")
-    public ResponseEntity<String> addCategory(@PathVariable int id,
-                                              @RequestBody String category) {
+    @PutMapping("{id}/categories")
+    public ResponseEntity<String> replaceCategory(@PathVariable int id,
+                                                  @RequestBody List<String> category) {
         var prOpt = this.repo.findById(id);
         if (!prOpt.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         var pr = prOpt.get();
-        pr.getCategories().add(category);
+        pr.getCategories().clear();
+        pr.getCategories().addAll(category);
         this.repo.save(pr);
         return ResponseEntity.created(null).build();
     }
-
-    @DeleteMapping("{id}/categories/{category}")
-    public ResponseEntity<?> removeCategory(@PathVariable int id,
-                                            @PathVariable String category) {
-        var prOpt = this.repo.findById(id);
-        if (!prOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        var pr = prOpt.get();
-        if (pr.getCategories().remove(category)) {
-            this.repo.save(pr);
-            return ResponseEntity.created(null).build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }

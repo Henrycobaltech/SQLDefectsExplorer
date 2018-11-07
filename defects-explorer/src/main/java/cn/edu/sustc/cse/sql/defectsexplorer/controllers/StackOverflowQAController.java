@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/so-qa-pages")
 public class StackOverflowQAController {
@@ -39,32 +41,17 @@ public class StackOverflowQAController {
         return ResponseEntity.ok(result.get());
     }
 
-    @PostMapping("{id}/categories")
-    public ResponseEntity<String> addCategory(@PathVariable ObjectId id,
-                                              @RequestBody String category) {
+    @PutMapping("{id}/categories")
+    public ResponseEntity<String> replaceCategory(@PathVariable ObjectId id,
+                                                  @RequestBody List<String> category) {
         var qaOpt = this.repo.findById(id);
         if (!qaOpt.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         var qa = qaOpt.get();
-        qa.getCategories().add(category);
+        qa.getCategories().clear();
+        qa.getCategories().addAll(category);
         this.repo.save(qa);
         return ResponseEntity.created(null).build();
-    }
-
-    @DeleteMapping("{id}/categories/{category}")
-    public ResponseEntity<?> removeCategory(@PathVariable ObjectId id,
-                                            @PathVariable String category) {
-        var qaOpt = this.repo.findById(id);
-        if (!qaOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        var qa = qaOpt.get();
-        if (qa.getCategories().remove(category)) {
-            this.repo.save(qa);
-            return ResponseEntity.created(null).build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
     }
 }
