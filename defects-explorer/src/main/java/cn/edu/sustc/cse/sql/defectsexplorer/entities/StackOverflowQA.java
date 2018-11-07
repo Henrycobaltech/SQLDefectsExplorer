@@ -9,7 +9,7 @@ import java.util.List;
 public class StackOverflowQA {
     private ObjectId id;
     private String title;
-    private String ody;
+    private String body;
     private List<String> tags;
     private int questionScore;
     private int questionFavoriate;
@@ -38,9 +38,9 @@ public class StackOverflowQA {
         return title;
     }
 
-//    public String getBody() {
-//        return body;
-//    }
+    public String getBody() {
+        return body;
+    }
 
     public List<String> getTags() {
         return tags;

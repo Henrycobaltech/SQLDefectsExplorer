@@ -14,7 +14,7 @@ class GitHub extends Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/api/pull-requests")
+    fetch("http://localhost:8080/api/pull-requests?page_idx=0&page_size=10")
       .then(res => res.json())
       .then(prs => this.setState({ pullRequests: prs }));
 

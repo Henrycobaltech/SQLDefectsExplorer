@@ -141,13 +141,13 @@ class Dashboard extends React.Component {
         this.setState({ value: event.target.value });
     };
     handleDelete = (id,source) =>{
-        console.log(1)
+        // console.log(1)
         // if(source==='GitHub')
         //     var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
         // else
         //     var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
         //
-        // const myRequest = new Request(url, {method: 'POST'});
+        // const myRequest = new Request(url, {method: 'POST',body:'delete'});
         //
         // fetch(myRequest)
         //     .then(response => {
@@ -245,25 +245,26 @@ class Dashboard extends React.Component {
             )
         }
         else if(source === 'StackOverflow'){
+            console.log(content.body)
             return(
                 <div>
                     <Typography variant="h6" gutterBottom >
-                        Title: {content.ques_title}
+                        Title: {content.title}
                     </Typography>
                     <ExpansionPanel>
                         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography >Question body    ****Score: {content.ques_score} Upvote: {content.upvote} Downvote: {content.downvote}</Typography>
+                            <Typography >Question body    ****Score: {content.questionScore} Upvote: {content.upvotes} Downvote: {content.downvotes}</Typography>
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
-                            <div dangerouslySetInnerHTML={{__html: content.ques_body}}/>
+                            <div dangerouslySetInnerHTML={{__html: content.body}}/>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
                     <ExpansionPanel>
                         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography >Answer body    ****Score: {content.ans_score} </Typography>
+                            <Typography >Answer body    ****Score: {content.answerScore} </Typography>
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
-                            <div dangerouslySetInnerHTML={{__html: content.ques_body}}/>
+                            <div dangerouslySetInnerHTML={{__html: content.answer}}/>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
                     <RadioGroup
