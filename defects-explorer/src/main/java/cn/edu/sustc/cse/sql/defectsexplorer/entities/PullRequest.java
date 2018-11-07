@@ -1,10 +1,33 @@
 package cn.edu.sustc.cse.sql.defectsexplorer.entities;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PullRequest {
+    private int id;
+    private int repoId;
+    private String repoName;
+    private String title;
+    private String body;
+    private Date updatedAt;
+    private Date createdAt;
+    private int commitsCount;
+    private boolean isMerged;
+    private Date mergedAt;
+    private int issueNumber;
+    private String state;
+    private int changedFiles;
+    private String headSha;
+    private List<Comment> comments;
+    private Set<String> categories;
+
+    public PullRequest(int id) {
+        this.id = id;
+        this.categories = new HashSet<>();
+    }
+
     public int getId() {
         return id;
     }
@@ -65,24 +88,8 @@ public class PullRequest {
         return comments;
     }
 
-    private int id;
-    private int repoId;
-    private String repoName;
-    private String title;
-    private String body;
-    private Date updatedAt;
-    private Date createdAt;
-    private int commitsCount;
-    private boolean isMerged;
-    private Date mergedAt;
-    private int issueNumber;
-    private String state;
-    private int changedFiles;
-    private String headSha;
-    private List<Comment> comments;
-
-    public PullRequest(int id) {
-        this.id = id;
-        this.createdAt = new Date();
+    public Set<String> getCategories() {
+        return categories;
     }
+
 }
