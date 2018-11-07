@@ -1,8 +1,9 @@
 package cn.edu.sustc.cse.sql.defectsexplorer.entities;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PullRequest {
     private int id;
@@ -20,11 +21,11 @@ public class PullRequest {
     private int changedFiles;
     private String headSha;
     private List<Comment> comments;
-    private List<String> categories;
+    private Set<String> categories;
 
     public PullRequest(int id) {
         this.id = id;
-        this.categories = new ArrayList<>();
+        this.categories = new HashSet<>();
     }
 
     public int getId() {
@@ -87,7 +88,7 @@ public class PullRequest {
         return comments;
     }
 
-    public List<String> getCategories() {
+    public Set<String> getCategories() {
         return categories;
     }
 

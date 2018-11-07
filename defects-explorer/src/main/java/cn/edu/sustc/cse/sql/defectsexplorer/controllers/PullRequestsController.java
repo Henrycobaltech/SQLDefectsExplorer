@@ -1,13 +1,11 @@
 package cn.edu.sustc.cse.sql.defectsexplorer.controllers;
 
+import cn.edu.sustc.cse.sql.defectsexplorer.entities.PullRequest;
 import cn.edu.sustc.cse.sql.defectsexplorer.persistence.PullRequestsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pull-requests")
@@ -29,6 +27,28 @@ public class PullRequestsController {
         return ResponseEntity.ok(
                 this.repo.findAll(PageRequest.of(pageIndex, pageSize)).getContent()
         );
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<PullRequest> get(@PathVariable int id) {
+        var result = this.repo.findById(id);
+        if (!result.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result.get());
+    }
+
+    @PostMapping("{id}/categories")
+    public ResponseEntity<String> addCategory(@PathVariable int id,
+                                              @RequestBody String category) {
+        var prOpt = this.repo.findById(id);
+        if (!prOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        var pr = prOpt.get();
+        pr.getCategories().add(category);
+        this.repo.save(pr);
+        return ResponseEntity.created(null).build();
     }
 
 }
