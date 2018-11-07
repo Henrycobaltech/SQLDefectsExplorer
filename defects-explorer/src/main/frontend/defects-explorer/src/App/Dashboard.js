@@ -26,11 +26,15 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import StackOverflow from './StackOverflow'
 import MobileStepper from '@material-ui/core/MobileStepper';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 
 const drawerWidth = 350;
 const styles = theme => ({
@@ -117,7 +121,6 @@ class Dashboard extends React.Component {
         open_list_2:false,
         show_content:[],
         show_resource:'',
-        selected_value: null,
         activeStep1:0,
         activeStep2:0,
         totalpage1:10,
@@ -125,7 +128,9 @@ class Dashboard extends React.Component {
         currentindex:0,
         currentcontent:[],
         currentindex2:0,
-        currentcontent2:[]
+        currentcontent2:[],
+        selected_types:[],
+        types_status:{'type1':false,'type2':false,'type3':false}
     };
 
     handleDrawerOpen = () => {
@@ -158,22 +163,29 @@ class Dashboard extends React.Component {
         //this.forceUpdate();
     }
 
-    handleChange = event => {
-        this.setState({ value: event.target.value });
+    handleChange = (name)  => {
+        var l = this.state.selected_types;
+        l.push(name)
+        var s = this.state.types_status;
+        s[name] = !s[name]
+        this.setState(state => ({
+            selected_types: l,
+            types_status: s
+        }));
     };
 
     handleDelete = (id,source) =>{
 
         if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
+            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
         else
-            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
+            var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
 
-        const myRequest = new Request(url, {method: 'POST'});
+        const myRequest = new Request(url, {method: 'POST',body:['delete']});
 
         fetch(myRequest)
             .then(response => {
-            if (response.status === 200) {
+            if (response.status === 201) {
                 alert("Delete Sucessfully")
             } else {
                 alert("Can't delete , server error")
@@ -212,32 +224,33 @@ class Dashboard extends React.Component {
     }
 
     handleSave= (id,source) =>{
-        var type=this.state.selected_value
+        var type=this.state.selected_types
+        console.log(type)
         if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
+            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
         else
-            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
+            var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
 
-        const myRequest = new Request(url, {method: 'POST'});
+        const myRequest = new Request(url, {method: 'POST',body:type});
 
         fetch(myRequest)
             .then(response => {
-                if (response.status === 200) {
-                    alert("Select Sucessfully")
+                if (response.status === 201) {
+                    alert("Saved Sucessfully")
                 } else {
-                    alert("Can't select , server error")
+                    alert("Can't save , server error")
                 }
             })
     }
 
     handleNextitem = (source)=>{
-
             if (source === "GitHub") {
                 var i = this.state.currentindex2;
                 if(i < this.state.currentcontent2.length) {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
-                        currentindex2: state.currentindex2 + 1
+                        currentindex2: state.currentindex2 + 1,
+                        types_status: {'type1':false,'type2':false,'type3':false}
                     }));
                     this.forceUpdate()
                 }
@@ -246,7 +259,8 @@ class Dashboard extends React.Component {
                 if(i < this.state.currentcontent2.length) {
                     this.setState(state => ({
                         show_content: state.currentcontent[i + 1],
-                        currentindex: state.currentindex + 1
+                        currentindex: state.currentindex + 1,
+                        types_status: {'type1':false,'type2':false,'type3':false}
                     }));
                     this.forceUpdate()
                 }
@@ -255,6 +269,7 @@ class Dashboard extends React.Component {
     }
 
     showContent = (content,source,classes) => {
+
         if(source === 'GitHub'){
             return(
                 <div>
@@ -289,22 +304,26 @@ class Dashboard extends React.Component {
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
 
-                    <RadioGroup
-                        aria-label="Type"
-                        className={classes.group}
-                        value={this.state.value}
-                        onChange={this.handleChange}
-                    >
-                        <FormControlLabel value="Type1" control={<Radio />} label="Type1" />
-                        <FormControlLabel value="Type2" control={<Radio />} label="Type2"/>
-                        <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
-                    </RadioGroup>
-
-                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content._id,'GitHub')}>
+                    {/*<RadioGroup*/}
+                        {/*aria-label="Type"*/}
+                        {/*className={classes.group}*/}
+                        {/*value={this.state.value}*/}
+                        {/*onChange={this.handleChange}*/}
+                    {/*>*/}
+                        {/*<FormControlLabel value="Type1" control={<Radio />} label="Type1" />*/}
+                        {/*<FormControlLabel value="Type2" control={<Radio />} label="Type2"/>*/}
+                        {/*<FormControlLabel value="Type3" control={<Radio />} label="Type3" />*/}
+                    {/*</RadioGroup>*/}
+                    <FormGroup row>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type1']} onChange={()=>this.handleChange('type1')}/>} label="type1"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type2']} onChange={()=>this.handleChange('type2')}/>} label="type2"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type3']} onChange={()=>this.handleChange('type3')} />} label="type3" />
+                    </FormGroup>
+                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content.id,'GitHub')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content._id,'GitHub')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content.id,'GitHub')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
@@ -337,22 +356,16 @@ class Dashboard extends React.Component {
                             <div dangerouslySetInnerHTML={{__html: content.answer}}/>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
-                    <RadioGroup
-                        aria-label="Type"
-                        className={classes.group}
-                        value={this.state.value}
-                        onChange={this.handleChange}
-                    >
-                        <FormControlLabel value="Type1" control={<Radio />} label="Type1" />
-                        <FormControlLabel value="Type2" control={<Radio />} label="Type2"/>
-                        <FormControlLabel value="Type3" control={<Radio />} label="Type3" />
-                    </RadioGroup>
-
-                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content._id,'StackOverflow')}>
+                    <FormGroup row>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type1']} onChange={()=>this.handleChange('type1')}/>} label="type1"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type2']} onChange={()=>this.handleChange('type2')}/>} label="type2"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type3']} onChange={()=>this.handleChange('type3')} />} label="type3" />
+                    </FormGroup>
+                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content.id,'StackOverflow')}>
                         Delete
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
-                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content._id,'StackOverflow')}>
+                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content.id,'StackOverflow')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
