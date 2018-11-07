@@ -51,4 +51,20 @@ public class StackOverflowQAController {
         this.repo.save(qa);
         return ResponseEntity.created(null).build();
     }
+
+    @DeleteMapping("{id}/categories/{category}")
+    public ResponseEntity<?> removeCategory(@PathVariable ObjectId id,
+                                            @PathVariable String category) {
+        var qaOpt = this.repo.findById(id);
+        if (!qaOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        var qa = qaOpt.get();
+        if (qa.getCategories().remove(category)) {
+            this.repo.save(qa);
+            return ResponseEntity.created(null).build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -51,4 +51,20 @@ public class PullRequestsController {
         return ResponseEntity.created(null).build();
     }
 
+    @DeleteMapping("{id}/categories/{category}")
+    public ResponseEntity<?> removeCategory(@PathVariable int id,
+                                            @PathVariable String category) {
+        var prOpt = this.repo.findById(id);
+        if (!prOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        var pr = prOpt.get();
+        if (pr.getCategories().remove(category)) {
+            this.repo.save(pr);
+            return ResponseEntity.created(null).build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
