@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
@@ -29,6 +30,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import StackOverflow from './StackOverflow'
+import MobileStepper from '@material-ui/core/MobileStepper';
 
 const drawerWidth = 350;
 const styles = theme => ({
@@ -116,6 +118,14 @@ class Dashboard extends React.Component {
         show_content:[],
         show_resource:'',
         selected_value: null,
+        activeStep1:0,
+        activeStep2:0,
+        totalpage1:10,
+        totalpage2:10,
+        currentindex:0,
+        currentcontent:[],
+        currentindex2:0,
+        currentcontent2:[]
     };
 
     handleDrawerOpen = () => {
@@ -133,56 +143,117 @@ class Dashboard extends React.Component {
             open_drawer: open,
         });
     };
-    setValue = (value,resource) => {
-        this.setState(state => ({ show_resource: resource ,show_content: value }));
+
+    setValue = (value,resource,index) => {
+        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index}));
         //this.forceUpdate();
     }
+
+    setPage = (page)=>{
+        this.setState(state => ({ currentcontent: page }));
+        //this.forceUpdate();
+    }
+    setPage2 = (page)=>{
+        this.setState(state => ({ currentcontent2: page }));
+        //this.forceUpdate();
+    }
+
     handleChange = event => {
         this.setState({ value: event.target.value });
     };
+
     handleDelete = (id,source) =>{
-        // console.log(1)
-        // if(source==='GitHub')
-        //     var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
-        // else
-        //     var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
-        //
-        // const myRequest = new Request(url, {method: 'POST',body:'delete'});
-        //
-        // fetch(myRequest)
-        //     .then(response => {
-        //     if (response.status === 200) {
-        //         alert("Delete Sucessfully")
-        //     } else {
-        //         alert("Can't delete , server error")
-        //     }
-        // })
+
+        if(source==='GitHub')
+            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/delete'
+        else
+            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/delete'
+
+        const myRequest = new Request(url, {method: 'POST'});
+
+        fetch(myRequest)
+            .then(response => {
+            if (response.status === 200) {
+                alert("Delete Sucessfully")
+            } else {
+                alert("Can't delete , server error")
+            }
+        })
     }
+
+    handleNext = (source) => {
+        return () =>{if(source==='G') {
+            this.setState(state => ({
+                activeStep1: state.activeStep1 + 1,
+                open_list_1:false
+            }));
+        }else{
+            this.setState(state => ({
+                activeStep2: state.activeStep2 + 1,
+                open_list_2:false
+            }));
+        };this.forceUpdate() ;
+        }
+
+    }
+
+    handleBack = (source) => {
+        return () =>{if(source==='G') {
+            this.setState(state => ({
+                activeStep1: state.activeStep1 - 1,
+                open_list_1:false
+            }));
+        }else{
+            this.setState(state => ({
+                activeStep2: state.activeStep2 - 1,
+                open_list_2:false
+            }));
+        };this.forceUpdate() ;}
+    }
+
     handleSave= (id,source) =>{
         var type=this.state.selected_value
-        // if(source==='GitHub')
-        //     var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
-        // else
-        //     var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
-        //
-        // const myRequest = new Request(url, {method: 'POST'});
-        //
-        // fetch(myRequest)
-        //     .then(response => {
-        //         if (response.status === 200) {
-        //             alert("Select Sucessfully")
-        //         } else {
-        //             alert("Can't select , server error")
-        //         }
-        //     })
-    }
-    handleNext=(source,id)=>{
-        if (source==="GitHub"){
+        if(source==='GitHub')
+            var url = 'http://localhost:8080/api/pull-requests/{'+id+'}/'+type
+        else
+            var url = 'http://localhost:8080/api/so-qa-pages/{'+id+'}/'+type
 
-        }else{
+        const myRequest = new Request(url, {method: 'POST'});
 
-        }
+        fetch(myRequest)
+            .then(response => {
+                if (response.status === 200) {
+                    alert("Select Sucessfully")
+                } else {
+                    alert("Can't select , server error")
+                }
+            })
     }
+
+    handleNextitem = (source)=>{
+
+            if (source === "GitHub") {
+                var i = this.state.currentindex2;
+                if(i < this.state.currentcontent2.length) {
+                    this.setState(state => ({
+                        show_content: state.currentcontent2[i + 1],
+                        currentindex2: state.currentindex2 + 1
+                    }));
+                    this.forceUpdate()
+                }
+            } else {
+                var i = this.state.currentindex;
+                if(i < this.state.currentcontent2.length) {
+                    this.setState(state => ({
+                        show_content: state.currentcontent[i + 1],
+                        currentindex: state.currentindex + 1
+                    }));
+                    this.forceUpdate()
+                }
+            }
+
+    }
+
     showContent = (content,source,classes) => {
         if(source === 'GitHub'){
             return(
@@ -237,7 +308,7 @@ class Dashboard extends React.Component {
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
-                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() => this.handleNext(source,content._id)}>
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() => this.handleNextitem('GitHub')}>
                         Next
                     </Button>
 
@@ -245,7 +316,6 @@ class Dashboard extends React.Component {
             )
         }
         else if(source === 'StackOverflow'){
-            console.log(content.body)
             return(
                 <div>
                     <Typography variant="h6" gutterBottom >
@@ -286,7 +356,7 @@ class Dashboard extends React.Component {
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
                         Save
                     </Button>
-                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() =>this.handleNext(source,content._id)}>
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() =>this.handleNextitem('StackOverflow')}>
                         Next
                     </Button>
                 </div>
@@ -301,9 +371,10 @@ class Dashboard extends React.Component {
             )
         }
     }
+
+
     render() {
         const { classes } = this.props;
-
         return (
             <React.Fragment>
                 <CssBaseline />
@@ -349,7 +420,26 @@ class Dashboard extends React.Component {
                                 {this.state.open_list_1 ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
                             <Collapse in={this.state.open_list_1&& this.state.open_drawer} timeout="auto"  >
-                                <GitHub setValue={this.setValue}/>
+                                <GitHub setValue={this.setValue} pagevalue = {this.state.activeStep1} setPage = {this.setPage2}/>
+                                <MobileStepper
+                                    variant="progress"
+                                    steps={this.state.totalpage1}
+                                    position="static"
+                                    activeStep={this.state.activeStep1}
+                                    className={classes.root}
+                                    nextButton={
+                                        <Button size="small" onClick={this.handleNext('G')} disabled={this.state.activeStep1 === this.state.totalpage1}>
+                                            Next
+                                            <KeyboardArrowRight />
+                                        </Button>
+                                    }
+                                    backButton={
+                                        <Button size="small" onClick={this.handleBack('G')} disabled={this.state.activeStep1 === 0}>
+                                            <KeyboardArrowLeft />
+                                            Back
+                                        </Button>
+                                    }
+                                />
                             </Collapse>
 
                             <ListItem button onClick={this.handleClick_2}>
@@ -357,7 +447,26 @@ class Dashboard extends React.Component {
                                 {this.state.open_list_2 ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
                             <Collapse in={this.state.open_list_2 && this.state.open_drawer} timeout="auto" unmountOnExit>
-                                <StackOverflow setValue={this.setValue}/>
+                                <StackOverflow setValue={this.setValue} pagevalue = {this.state.activeStep2} setPage = {this.setPage}/>
+                                <MobileStepper
+                                    variant="progress"
+                                    steps={this.state.totalpage2}
+                                    position="static"
+                                    activeStep={this.state.activeStep2}
+                                    className={classes.root}
+                                    nextButton={
+                                        <Button size="small" onClick={this.handleNext('S')} disabled={this.state.activeStep2 === this.state.totalpage2}>
+                                            Next
+                                            <KeyboardArrowRight />
+                                        </Button>
+                                    }
+                                    backButton={
+                                        <Button size="small" onClick={this.handleBack('S')} disabled={this.state.activeStep2 === 0}>
+                                            <KeyboardArrowLeft />
+                                            Back
+                                        </Button>
+                                    }
+                                />
                             </Collapse>
                         </List>
                         <Divider />
@@ -381,6 +490,7 @@ class Dashboard extends React.Component {
 
 Dashboard.propTypes = {
     classes: PropTypes.object.isRequired,
+
 };
 
 export default withStyles(styles)(Dashboard);
