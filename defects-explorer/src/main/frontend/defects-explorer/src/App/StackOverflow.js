@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import {  List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
-import Button from "@material-ui/core/Button/Button";
-import MobileStepper from "@material-ui/core/MobileStepper/MobileStepper";
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
 import StarIcon from '@material-ui/icons/Star';
 
