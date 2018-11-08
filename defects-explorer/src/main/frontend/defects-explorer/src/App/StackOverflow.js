@@ -6,7 +6,7 @@ import MobileStepper from "@material-ui/core/MobileStepper/MobileStepper";
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
-import StarIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import StarIcon from '@material-ui/icons/Star';
 
 class StackOverflow extends Component {
 
@@ -52,7 +52,7 @@ class StackOverflow extends Component {
         }
     }
     select(pr){
-        if(pr.hasOwnProperty("category")){
+        if(pr["categories"].length>0){
             return(
                 <ListItemIcon>
                     <StarIcon />

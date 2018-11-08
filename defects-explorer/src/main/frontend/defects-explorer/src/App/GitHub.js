@@ -28,14 +28,14 @@ class GitHub extends Component {
           });
       }
   }
-  select(pr){
-      if(pr.hasOwnProperty("category")){
-          return(
-          <ListItemIcon>
-              <StarIcon />
-          </ListItemIcon>)
-      }
-  }
+    select(pr){
+        if(pr["categories"].length>0){
+            return(
+                <ListItemIcon>
+                    <StarIcon />
+                </ListItemIcon>)
+        }
+    }
 
   render() {
 

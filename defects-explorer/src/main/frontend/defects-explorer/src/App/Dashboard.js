@@ -130,7 +130,7 @@ class Dashboard extends React.Component {
         currentindex2:0,
         currentcontent2:[],
         selected_types:[],
-        types_status:{'type1':false,'type2':false,'type3':false}
+        types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}
     };
 
     handleDrawerOpen = () => {
@@ -150,7 +150,7 @@ class Dashboard extends React.Component {
     };
 
     setValue = (value,resource,index) => {
-        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index,selected_types:[],types_status:{'type1':false,'type2':false,'type3':false}}));
+        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index,selected_types:[],types_status:{'type1':false,'Performance':false,'Memory Leak':false}}));
         //this.forceUpdate();
     }
 
@@ -181,7 +181,9 @@ class Dashboard extends React.Component {
         else
             var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
 
-        const myRequest = new Request(url, {method: 'PUT',body:['delete']});
+        const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(['delete']), headers:{
+                'Content-Type': 'application/json'
+            }});
 
         fetch(myRequest)
             .then(response => {
@@ -224,15 +226,16 @@ class Dashboard extends React.Component {
     }
 
     handleSave= (id,source) =>{
-        var type=this.state.selected_types
-
+        let type=this.state.selected_types;
         if(source=='GitHub')
             var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
         else {
 
             var url = 'http://localhost:8080/api/so-qa-pages/' +id  + '/categories'
         }
-        const myRequest = new Request(url, {method: 'PUT',body:type});
+        const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(type), headers:{
+            'Content-Type': 'application/json'
+            }});
 
         fetch(myRequest)
             .then(response => {
@@ -252,7 +255,7 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
                         currentindex2: state.currentindex2 + 1,
-                        types_status: {'type1':false,'type2':false,'type3':false},
+                        types_status: {'Crash':false,'Performance':false,'Memory Leak':false},
                         selected_types:[]
                     }));
                     this.forceUpdate()
@@ -263,7 +266,7 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent[i + 1],
                         currentindex: state.currentindex + 1,
-                        types_status: {'type1':false,'type2':false,'type3':false},
+                        types_status: {'Crash':false,'Performance':false,'Memory Leak':false},
                         selected_types:[]
                     }));
                     this.forceUpdate()
@@ -278,7 +281,7 @@ class Dashboard extends React.Component {
             return(
                 <div>
                     <Typography variant="h6" gutterBottom >
-                        Title: {content.title}
+                        Title: {content.title}***{content.repoName}
                     </Typography>
 
                     <ExpansionPanel>
@@ -314,17 +317,19 @@ class Dashboard extends React.Component {
                         {/*value={this.state.value}*/}
                         {/*onChange={this.handleChange}*/}
                     {/*>*/}
-                        {/*<FormControlLabel value="Type1" control={<Radio />} label="Type1" />*/}
-                        {/*<FormControlLabel value="Type2" control={<Radio />} label="Type2"/>*/}
-                        {/*<FormControlLabel value="Type3" control={<Radio />} label="Type3" />*/}
+                        {/*<FormControlLabel value="Crash" control={<Radio />} label="Crash" />*/}
+                        {/*<FormControlLabel value="Performance" control={<Radio />} label="Performance"/>*/}
+                        {/*<FormControlLabel value="Memory Leak" control={<Radio />} label="Memory Leak" />*/}
                     {/*</RadioGroup>*/}
                     <FormGroup row>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type1']} onChange={()=>this.handleChange('type1')}/>} label="type1"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type2']} onChange={()=>this.handleChange('type2')}/>} label="type2"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type3']} onChange={()=>this.handleChange('type3')} />} label="type3" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Memory Leak']} onChange={()=>this.handleChange('Memory Leak')} />} label="Memory Leak" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Security']} onChange={()=>this.handleChange('Security')} />} label="Security" />
+
                     </FormGroup>
                     <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content.id,'GitHub')}>
-                        Delete
+                        Useless
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content.id,'GitHub')}>
@@ -361,12 +366,14 @@ class Dashboard extends React.Component {
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
                     <FormGroup row>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type1']} onChange={()=>this.handleChange('type1')}/>} label="type1"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type2']} onChange={()=>this.handleChange('type2')}/>} label="type2"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['type3']} onChange={()=>this.handleChange('type3')} />} label="type3" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Memory Leak']} onChange={()=>this.handleChange('Memory Leak')} />} label="Memory Leak" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Security']} onChange={()=>this.handleChange('Security')} />} label="Security" />
+
                     </FormGroup>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content.id,'StackOverflow')}>
-                        Delete
+                        Useless
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content.id,'StackOverflow')}>
