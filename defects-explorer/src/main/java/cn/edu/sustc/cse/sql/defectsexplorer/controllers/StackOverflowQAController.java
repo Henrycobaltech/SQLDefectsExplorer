@@ -2,7 +2,6 @@ package cn.edu.sustc.cse.sql.defectsexplorer.controllers;
 
 import cn.edu.sustc.cse.sql.defectsexplorer.entities.StackOverflowQA;
 import cn.edu.sustc.cse.sql.defectsexplorer.persistence.StackOverflowQARepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class StackOverflowQAController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<StackOverflowQA> get(@PathVariable ObjectId id) {
+    public ResponseEntity<StackOverflowQA> get(@PathVariable int id) {
         var result = this.repo.findById(id);
         if (!result.isPresent()) {
             return ResponseEntity.notFound().build();
@@ -42,7 +41,7 @@ public class StackOverflowQAController {
     }
 
     @PutMapping("{id}/categories")
-    public ResponseEntity<String> replaceCategory(@PathVariable ObjectId id,
+    public ResponseEntity<String> replaceCategory(@PathVariable int id,
                                                   @RequestBody List<String> category) {
         var qaOpt = this.repo.findById(id);
         if (!qaOpt.isPresent()) {

@@ -1,14 +1,12 @@
 package cn.edu.sustc.cse.sql.defectsexplorer.entities;
 
-import org.bson.types.ObjectId;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class StackOverflowQA {
-    private ObjectId id;
+    private int id;
     private String title;
     private String body;
     private List<String> tags;
@@ -27,7 +25,7 @@ public class StackOverflowQA {
         this.categories = new HashSet<>();
     }
 
-    public ObjectId getId() {
+    public int getId() {
         return id;
     }
 
