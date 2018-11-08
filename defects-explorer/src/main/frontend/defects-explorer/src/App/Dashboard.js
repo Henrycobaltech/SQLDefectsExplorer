@@ -150,7 +150,7 @@ class Dashboard extends React.Component {
     };
 
     setValue = (value,resource,index) => {
-        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index}));
+        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index,selected_types:[],types_status:{'type1':false,'type2':false,'type3':false}}));
         //this.forceUpdate();
     }
 
@@ -181,7 +181,7 @@ class Dashboard extends React.Component {
         else
             var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
 
-        const myRequest = new Request(url, {method: 'POST',body:['delete']});
+        const myRequest = new Request(url, {method: 'PUT',body:['delete']});
 
         fetch(myRequest)
             .then(response => {
@@ -225,19 +225,21 @@ class Dashboard extends React.Component {
 
     handleSave= (id,source) =>{
         var type=this.state.selected_types
-        console.log(type)
-        if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
-        else
-            var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
 
-        const myRequest = new Request(url, {method: 'POST',body:type});
+        if(source=='GitHub')
+            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
+        else {
+
+            var url = 'http://localhost:8080/api/so-qa-pages/' +id  + '/categories'
+        }
+        const myRequest = new Request(url, {method: 'PUT',body:type});
 
         fetch(myRequest)
             .then(response => {
                 if (response.status === 201) {
                     alert("Saved Sucessfully")
                 } else {
+                    console.log(response.toString())
                     alert("Can't save , server error")
                 }
             })
@@ -250,7 +252,8 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
                         currentindex2: state.currentindex2 + 1,
-                        types_status: {'type1':false,'type2':false,'type3':false}
+                        types_status: {'type1':false,'type2':false,'type3':false},
+                        selected_types:[]
                     }));
                     this.forceUpdate()
                 }
@@ -260,7 +263,8 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent[i + 1],
                         currentindex: state.currentindex + 1,
-                        types_status: {'type1':false,'type2':false,'type3':false}
+                        types_status: {'type1':false,'type2':false,'type3':false},
+                        selected_types:[]
                     }));
                     this.forceUpdate()
                 }
