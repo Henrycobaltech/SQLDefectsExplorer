@@ -3,9 +3,7 @@ import {  List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
 import StarIcon from '@material-ui/icons/Star';
-
 class StackOverflow extends Component {
-
     state = {
         ques: [],
         selectedPr: null,
