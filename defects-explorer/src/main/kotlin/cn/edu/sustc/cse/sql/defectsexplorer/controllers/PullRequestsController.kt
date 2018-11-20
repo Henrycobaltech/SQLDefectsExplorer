@@ -13,13 +13,11 @@ import java.net.URI
 class PullRequestsController @Autowired constructor(private val repo: PullRequestsRepository) {
 
     @GetMapping("")
-    fun getAll(@RequestParam(value = "page_idx", defaultValue = "0") pageIndex: Int,
-               @RequestParam(value = "page_size", defaultValue = "10") pageSize: Int): ResponseEntity<*> {
-        return when {
-            pageIndex < 0 || pageSize <= 0 -> ResponseEntity.badRequest().body("Invalid page index or page size.")
-            else -> ResponseEntity.ok(this.repo.findAll(PageRequest.of(pageIndex, pageSize)).content)
-        }
-    }
+    fun getAll(@RequestParam("page_idx", defaultValue = "0") pageIndex: Int,
+               @RequestParam("page_size", defaultValue = "10") pageSize: Int) = when {
+                   pageIndex < 0 || pageSize <= 0 -> ResponseEntity.badRequest().body("Invalid page index or page size.")
+                   else -> ResponseEntity.ok(this.repo.findAll(PageRequest.of(pageIndex, pageSize)).content)
+               }
 
     @GetMapping("{id}")
     operator fun get(@PathVariable id: Int): ResponseEntity<PullRequest> {
