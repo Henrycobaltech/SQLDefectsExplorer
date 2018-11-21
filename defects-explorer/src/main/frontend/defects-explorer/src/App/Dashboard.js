@@ -31,8 +31,11 @@ import MobileStepper from '@material-ui/core/MobileStepper';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-
+import marked from 'marked';
 const drawerWidth = 350;
+const isDebug = true;
+
+const apiHost = isDebug?"http://localhost:8080":"";
 const styles = theme => ({
     root: {
         display: 'flex',
@@ -125,6 +128,7 @@ class Dashboard extends React.Component {
         currentcontent:[],
         currentindex2:0,
         currentcontent2:[],
+
         selected_types:[],
         types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}
     };
@@ -150,12 +154,13 @@ class Dashboard extends React.Component {
         //this.forceUpdate();
     }
 
-    setPage = (page)=>{
-        this.setState(state => ({ currentcontent: page }));
+    setPage = (page,totalpage)=>{
+        this.setState(state => ({ currentcontent: page , totalpage1:totalpage}));
         //this.forceUpdate();
     }
-    setPage2 = (page)=>{
-        this.setState(state => ({ currentcontent2: page }));
+    setPage2 = (page,totalpage)=>{
+        this.setState(state => ({ currentcontent2: page ,
+                                   totalpage2:totalpage }));
         //this.forceUpdate();
     }
 
@@ -173,9 +178,9 @@ class Dashboard extends React.Component {
     handleDelete = (id,source) =>{
 
         if(source==='GitHub')
-            var url = '/api/pull-requests/'+id+'/categories'
+            var url = `${apiHost}/api/pull-requests/${id}/categories`
         else
-            var url = '/api/so-qa-pages/'+id+'/categories'
+            var url = `${apiHost}/api/so-qa-pages/${id}/categories`
 
         const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(['delete']), headers:{
                 'Content-Type': 'application/json'
@@ -192,7 +197,7 @@ class Dashboard extends React.Component {
     }
 
     handleNext = (source) => {
-        return () =>{if(source==='G') {
+        return () =>{if(source=='G') {
             this.setState(state => ({
                 activeStep1: state.activeStep1 + 1,
                 open_list_1:false
@@ -223,12 +228,10 @@ class Dashboard extends React.Component {
 
     handleSave= (id,source) =>{
         let type=this.state.selected_types;
-        if(source=='GitHub')
-            var url = '/api/pull-requests/'+id+'/categories'
-        else {
-
-            var url = '/api/so-qa-pages/' +id  + '/categories'
-        }
+        if(source==='GitHub')
+            var url = `${apiHost}/api/pull-requests/${id}/categories`
+        else
+            var url = `${apiHost}/api/so-qa-pages/${id}/categories`
         const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(type), headers:{
             'Content-Type': 'application/json'
             }});
@@ -238,7 +241,6 @@ class Dashboard extends React.Component {
                 if (response.status === 201) {
                     alert("Saved Sucessfully")
                 } else {
-                    console.log(response.toString())
                     alert("Can't save , server error")
                 }
             })
@@ -277,46 +279,13 @@ class Dashboard extends React.Component {
             return(
                 <div>
                     <Typography variant="h6" gutterBottom >
-                        Title: {content.title}***{content.repoName}
+                        Title: {content.title}
                     </Typography>
 
-                    <ExpansionPanel>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography > Body</Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                            <Typography  gutterBottom component="h5">
-                                {content.body}
-                            </Typography>
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
-
-                    <ExpansionPanel>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography >Comments</Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                            <List>
-                                {content.comments.map((pr,i) =>
-                                    <ListItem key = {1}>
-                                        {i+1}. {pr.body}
-                                    </ListItem>
-
-                                )}
-                            </List>
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
-
-                    {/*<RadioGroup*/}
-                        {/*aria-label="Type"*/}
-                        {/*className={classes.group}*/}
-                        {/*value={this.state.value}*/}
-                        {/*onChange={this.handleChange}*/}
-                    {/*>*/}
-                        {/*<FormControlLabel value="Crash" control={<Radio />} label="Crash" />*/}
-                        {/*<FormControlLabel value="Performance" control={<Radio />} label="Performance"/>*/}
-                        {/*<FormControlLabel value="Memory Leak" control={<Radio />} label="Memory Leak" />*/}
-                    {/*</RadioGroup>*/}
+                    <a href="`https://github.com/${content.repoName}/pull/${content.issueNumber}`" onClick={()=>window.open(`https://github.com/${content.repoName}/pull/${content.issueNumber}`)}>Clink here</a>
+                    <Typography variant="h6" gutterBottom >
+                        Repo: {content.repoName}
+                    </Typography>
                     <FormGroup row>
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
@@ -336,6 +305,43 @@ class Dashboard extends React.Component {
                         Next
                     </Button>
 
+                    <ExpansionPanel>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography > Body</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <div dangerouslySetInnerHTML={{__html: marked(content.body)}}/>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+
+                    <ExpansionPanel>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography >Comments</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <List>
+                                {content.comments.map((pr,i) =>
+                                    <ListItem key = {1}>
+                                        {i+1}. <div dangerouslySetInnerHTML={{__html: marked(pr.body)}}/>
+                                    </ListItem>
+
+                                )}
+                            </List>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+
+                    {/*<RadioGroup*/}
+                        {/*aria-label="Type"*/}
+                        {/*className={classes.group}*/}
+                        {/*value={this.state.value}*/}
+                        {/*onChange={this.handleChange}*/}
+                    {/*>*/}
+                        {/*<FormControlLabel value="Crash" control={<Radio />} label="Crash" />*/}
+                        {/*<FormControlLabel value="Performance" control={<Radio />} label="Performance"/>*/}
+                        {/*<FormControlLabel value="Memory Leak" control={<Radio />} label="Memory Leak" />*/}
+                    {/*</RadioGroup>*/}
+
+
                 </div>
             )
         }
@@ -345,22 +351,6 @@ class Dashboard extends React.Component {
                     <Typography variant="h6" gutterBottom >
                         Title: {content.title}
                     </Typography>
-                    <ExpansionPanel>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography >Question body    ****Score: {content.questionScore} Upvote: {content.upvotes} Downvote: {content.downvotes}</Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                            <div dangerouslySetInnerHTML={{__html: content.body}}/>
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                    <ExpansionPanel>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography >Answer body    ****Score: {content.answerScore} </Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                            <div dangerouslySetInnerHTML={{__html: content.answer}}/>
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
                     <FormGroup row>
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
@@ -379,6 +369,23 @@ class Dashboard extends React.Component {
                     <Button variant="contained"  size = "large"className={classes.button} onClick = {() =>this.handleNextitem('StackOverflow')}>
                         Next
                     </Button>
+                    <ExpansionPanel>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography >Question body    ****Score: {content.questionScore} Upvote: {content.upvotes} Downvote: {content.downvotes}</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <div dangerouslySetInnerHTML={{__html: content.body}}/>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography >Answer body    ****Score: {content.answerScore} </Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <div dangerouslySetInnerHTML={{__html: content.answer}}/>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+
                 </div>
 
             )
@@ -439,7 +446,8 @@ class Dashboard extends React.Component {
                                 <ListItemText inset primary="GitHub" />
                                 {this.state.open_list_1 ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
-                            <Collapse in={this.state.open_list_1&& this.state.open_drawer} timeout="auto"  >
+                            <Collapse in={this.state.open_list_1 & this.state.open_drawer} timeout="auto" unmountOnExit >
+                                {console.log(this.state.open_list_1 ,this.state.open_drawer,this.state.activeStep1)}
                                 <GitHub setValue={this.setValue} pagevalue = {this.state.activeStep1} setPage = {this.setPage2}/>
                                 <MobileStepper
                                     variant="progress"

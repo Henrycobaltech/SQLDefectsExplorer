@@ -3,6 +3,11 @@ import {  List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
 import StarIcon from '@material-ui/icons/Star';
+
+const isDebug = true;
+
+const apiHost = isDebug?"http://localhost:8080":"";
+
 class StackOverflow extends Component {
     state = {
         ques: [],
@@ -13,10 +18,9 @@ class StackOverflow extends Component {
     componentDidMount() {
         var page = this.props.pagevalue
         // while(true) {
-        fetch('/api/so-qa-pages?page_idx='+page+'&page_size=50')
+        fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
             .then(res => res.json())
-            .then(prs => {this.setState({ques: prs});this.props.setPage(prs)});
-
+            .then(prs => {this.setState({ques: prs.content});this.props.setPage(prs.content,prs.totolPages)});
         // }
     }
     // handleNext = () => {

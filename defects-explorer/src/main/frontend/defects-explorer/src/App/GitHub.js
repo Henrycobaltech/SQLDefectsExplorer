@@ -3,6 +3,11 @@ import { List, ListItem, ListItemText } from '@material-ui/core';
 import './GitHub.css';
 import StarIcon from '@material-ui/icons/Star';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+
+const isDebug = true;
+
+const apiHost = isDebug?"http://localhost:8080":"";
+
 class GitHub extends Component {
   constructor(props) {
     super(props);
@@ -13,9 +18,11 @@ class GitHub extends Component {
   }
 
   componentDidMount() {
-    fetch("/api/pull-requests?page_idx=0&page_size=50")
-      .then(res => res.json())
-      .then(prs => {this.setState({ pullRequests: prs });this.props.setPage(prs)});
+      var page = this.props.pagevalue
+
+      fetch(`${apiHost}/api/pull-requests?page_idx=${page}&&page_size=50`)
+        .then(res => res.json())
+        .then(prs => {this.setState({ pullRequests: prs.content });this.props.setPage(prs.content,prs.totalPages)});
 
   }
 
