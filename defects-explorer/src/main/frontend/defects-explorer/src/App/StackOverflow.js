@@ -13,7 +13,7 @@ class StackOverflow extends Component {
     componentDidMount() {
         var page = this.props.pagevalue
         // while(true) {
-        fetch('http://localhost:8080/api/so-qa-pages?page_idx='+page+'&page_size=50')
+        fetch('/api/so-qa-pages?page_idx='+page+'&page_size=50')
             .then(res => res.json())
             .then(prs => {this.setState({ques: prs});this.props.setPage(prs)});
 

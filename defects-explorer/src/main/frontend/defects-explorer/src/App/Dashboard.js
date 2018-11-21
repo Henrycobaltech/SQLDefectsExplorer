@@ -173,9 +173,9 @@ class Dashboard extends React.Component {
     handleDelete = (id,source) =>{
 
         if(source==='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
+            var url = '/api/pull-requests/'+id+'/categories'
         else
-            var url = 'http://localhost:8080/api/so-qa-pages/'+id+'/categories'
+            var url = '/api/so-qa-pages/'+id+'/categories'
 
         const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(['delete']), headers:{
                 'Content-Type': 'application/json'
@@ -224,10 +224,10 @@ class Dashboard extends React.Component {
     handleSave= (id,source) =>{
         let type=this.state.selected_types;
         if(source=='GitHub')
-            var url = 'http://localhost:8080/api/pull-requests/'+id+'/categories'
+            var url = '/api/pull-requests/'+id+'/categories'
         else {
 
-            var url = 'http://localhost:8080/api/so-qa-pages/' +id  + '/categories'
+            var url = '/api/so-qa-pages/' +id  + '/categories'
         }
         const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(type), headers:{
             'Content-Type': 'application/json'
