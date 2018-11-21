@@ -276,13 +276,14 @@ class Dashboard extends React.Component {
     showContent = (content,source,classes) => {
 
         if(source === 'GitHub'){
+            const prUrl = `https://github.com/${content.repoName}/pull/${content.issueNumber}`;
             return(
                 <div>
                     <Typography variant="h6" gutterBottom >
                         Title: {content.title}
                     </Typography>
 
-                    <a href="`https://github.com/${content.repoName}/pull/${content.issueNumber}`" onClick={()=>window.open(`https://github.com/${content.repoName}/pull/${content.issueNumber}`)}>Clink here</a>
+                    <a href={ prUrl } target="_blank" rel="noopener noreferrer">{ prUrl }</a>
                     <Typography variant="h6" gutterBottom >
                         Repo: {content.repoName}
                     </Typography>
