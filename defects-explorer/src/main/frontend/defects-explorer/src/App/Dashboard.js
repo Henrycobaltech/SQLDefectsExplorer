@@ -113,6 +113,7 @@ const styles = theme => ({
     },
 });
 
+const initialType = {'Crash':false,'Performance':false,'Memory Leak':false,'Security':false};
 class Dashboard extends React.Component {
     state = {
         open_drawer: false,
@@ -120,17 +121,17 @@ class Dashboard extends React.Component {
         open_list_2:false,
         show_content:[],
         show_resource:'',
-        activeStep1:0,
-        activeStep2:0,
-        totalpage1:10,
-        totalpage2:10,
-        currentindex:0,
-        currentcontent:[],
-        currentindex2:0,
-        currentcontent2:[],
+        activeStep1:0,//S
+        activeStep2:0,//G
+        totalpage1:10,//S
+        totalpage2:10,//G
+        currentindex1:0,//Stackoverflow
+        currentcontent1:[],//S
+        currentindex2:0, //GitHub
+        currentcontent2:[],//G
 
         selected_types:[],
-        types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}
+        types_status:initialType
     };
 
     handleDrawerOpen = () => {
@@ -149,19 +150,22 @@ class Dashboard extends React.Component {
         });
     };
 
-    setValue = (value,resource,index) => {
-        this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex:index,selected_types:[],types_status:{'type1':false,'Performance':false,'Memory Leak':false}}));
-        //this.forceUpdate();
+    setValue = (value,resource,index) => {//stackoverflow
+        if (resource=="GitHub"){
+            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex2:index,selected_types:[],types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}}));
+        }else{
+            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex1:index,selected_types:[],types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}}));
+        }
+            this.forceUpdate();
     }
 
-    setPage = (page,totalpage)=>{
-        this.setState(state => ({ currentcontent: page , totalpage1:totalpage}));
-        //this.forceUpdate();
-    }
-    setPage2 = (page,totalpage)=>{
-        this.setState(state => ({ currentcontent2: page ,
-                                   totalpage2:totalpage }));
-        //this.forceUpdate();
+    setPage = (page,totalpage,resource)=>{
+        if (resource == 'GitHub'){
+            this.setState(state => ({ currentcontent2: page , totalpage2:totalpage }));
+        }else{
+            this.setState(state => ({ currentcontent1: page , totalpage1:totalpage }));
+        }
+        this.forceUpdate()
     }
 
     handleChange = (name)  => {
@@ -199,15 +203,15 @@ class Dashboard extends React.Component {
     handleNext = (source) => {
         return () =>{if(source=='G') {
             this.setState(state => ({
-                activeStep1: state.activeStep1 + 1,
-                open_list_1:false
-            }));
-        }else{
-            this.setState(state => ({
                 activeStep2: state.activeStep2 + 1,
                 open_list_2:false
             }));
-        };this.forceUpdate() ;
+        }else{
+            this.setState(state => ({
+                activeStep1: state.activeStep1 + 1,
+                open_list_1:false
+            }));
+        };
         }
 
     }
@@ -215,15 +219,15 @@ class Dashboard extends React.Component {
     handleBack = (source) => {
         return () =>{if(source==='G') {
             this.setState(state => ({
-                activeStep1: state.activeStep1 - 1,
-                open_list_1:false
-            }));
-        }else{
-            this.setState(state => ({
                 activeStep2: state.activeStep2 - 1,
                 open_list_2:false
             }));
-        };this.forceUpdate() ;}
+        }else{
+            this.setState(state => ({
+                activeStep1: state.activeStep1 - 1,
+                open_list_1:false
+            }));
+        };}
     }
 
     handleSave= (id,source) =>{
@@ -249,32 +253,43 @@ class Dashboard extends React.Component {
     handleNextitem = (source)=>{
             if (source === "GitHub") {
                 var i = this.state.currentindex2;
-                if(i < this.state.currentcontent2.length) {
+                if(i < this.state.currentcontent2.length-1) {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
                         currentindex2: state.currentindex2 + 1,
-                        types_status: {'Crash':false,'Performance':false,'Memory Leak':false},
+                        types_status: initialType,
                         selected_types:[]
                     }));
-                    this.forceUpdate()
+                }else{
+                    var apiHost = isDebug?"http://localhost:8080":"";
+                    var page = this.state.activeStep2+1;
+
+                    fetch(`${apiHost}/api/pull-requests?page_idx=${page}&page_size=50`)
+                        .then(res => res.json())
+                        .then(prs => {this.setState({currentcontent2: prs.content, totalpage2:prs.totalPages, activeStep2:page, currentindex2: 0, show_content: prs.content[0]});});
                 }
             } else {
-                var i = this.state.currentindex;
-                if(i < this.state.currentcontent2.length) {
+                var i = this.state.currentindex1;
+                if(i < this.state.currentcontent1.length-1) {
                     this.setState(state => ({
-                        show_content: state.currentcontent[i + 1],
-                        currentindex: state.currentindex + 1,
-                        types_status: {'Crash':false,'Performance':false,'Memory Leak':false},
+                        show_content: state.currentcontent1[i + 1],
+                        currentindex1: state.currentindex1 + 1,
+                        types_status: initialType,
                         selected_types:[]
                     }));
-                    this.forceUpdate()
+                }else{
+                    var apiHost = isDebug?"http://localhost:8080":"";
+                    var page = this.state.activeStep1+1;
+                    fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
+                        .then(res => res.json())
+                        .then(prs => {this.setState({currentcontent1: prs.content, totalpage1:prs.totalPages, activeStep1:page, currentindex1: 0, show_content: prs.content[0]});});
                 }
             }
 
     }
 
     showContent = (content,source,classes) => {
-
+        console.log(content)
         if(source === 'GitHub'){
             const prUrl = `https://github.com/${content.repoName}/pull/${content.issueNumber}`;
             return(
@@ -330,19 +345,6 @@ class Dashboard extends React.Component {
                             </List>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
-
-                    {/*<RadioGroup*/}
-                        {/*aria-label="Type"*/}
-                        {/*className={classes.group}*/}
-                        {/*value={this.state.value}*/}
-                        {/*onChange={this.handleChange}*/}
-                    {/*>*/}
-                        {/*<FormControlLabel value="Crash" control={<Radio />} label="Crash" />*/}
-                        {/*<FormControlLabel value="Performance" control={<Radio />} label="Performance"/>*/}
-                        {/*<FormControlLabel value="Memory Leak" control={<Radio />} label="Memory Leak" />*/}
-                    {/*</RadioGroup>*/}
-
-
                 </div>
             )
         }
@@ -357,7 +359,6 @@ class Dashboard extends React.Component {
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Memory Leak']} onChange={()=>this.handleChange('Memory Leak')} />} label="Memory Leak" />
                         <FormControlLabel control={<Checkbox checked = {this.state.types_status['Security']} onChange={()=>this.handleChange('Security')} />} label="Security" />
-
                     </FormGroup>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content.id,'StackOverflow')}>
                         Useless
@@ -386,11 +387,8 @@ class Dashboard extends React.Component {
                             <div dangerouslySetInnerHTML={{__html: content.answer}}/>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
-
                 </div>
-
             )
-
         }else{
             return (
                 <Typography variant="h5" gutterBottom >
@@ -434,7 +432,6 @@ class Dashboard extends React.Component {
                             </Typography>
                         </Toolbar>
                     </AppBar>
-
                     <SwipeableDrawer
                         open={this.state.open_drawer}
                         onClose={this.toggleDrawer(false)}
@@ -442,41 +439,12 @@ class Dashboard extends React.Component {
                     >
                         <Divider />
                         <List>
-
-                            <ListItem button onClick={this.handleClick_1}>
-                                <ListItemText inset primary="GitHub" />
-                                {this.state.open_list_1 ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={this.state.open_list_1 & this.state.open_drawer} timeout="auto" unmountOnExit >
-                                {console.log(this.state.open_list_1 ,this.state.open_drawer,this.state.activeStep1)}
-                                <GitHub setValue={this.setValue} pagevalue = {this.state.activeStep1} setPage = {this.setPage2}/>
-                                <MobileStepper
-                                    variant="progress"
-                                    steps={this.state.totalpage1}
-                                    position="static"
-                                    activeStep={this.state.activeStep1}
-                                    className={classes.root}
-                                    nextButton={
-                                        <Button size="small" onClick={this.handleNext('G')} disabled={this.state.activeStep1 === this.state.totalpage1}>
-                                            Next
-                                            <KeyboardArrowRight />
-                                        </Button>
-                                    }
-                                    backButton={
-                                        <Button size="small" onClick={this.handleBack('G')} disabled={this.state.activeStep1 === 0}>
-                                            <KeyboardArrowLeft />
-                                            Back
-                                        </Button>
-                                    }
-                                />
-                            </Collapse>
-
                             <ListItem button onClick={this.handleClick_2}>
-                                <ListItemText inset primary="StackOverflow" />
+                                <ListItemText inset primary="GitHub" />
                                 {this.state.open_list_2 ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
-                            <Collapse in={this.state.open_list_2 && this.state.open_drawer} timeout="auto" unmountOnExit>
-                                <StackOverflow setValue={this.setValue} pagevalue = {this.state.activeStep2} setPage = {this.setPage}/>
+                            <Collapse in={this.state.open_list_2 & this.state.open_drawer} timeout="auto" unmountOnExit >
+                                <GitHub setValue={this.setValue} pagevalue = {this.state.activeStep2} setPage = {this.setPage}/>
                                 <MobileStepper
                                     variant="progress"
                                     steps={this.state.totalpage2}
@@ -484,13 +452,40 @@ class Dashboard extends React.Component {
                                     activeStep={this.state.activeStep2}
                                     className={classes.root}
                                     nextButton={
-                                        <Button size="small" onClick={this.handleNext('S')} disabled={this.state.activeStep2 === this.state.totalpage2}>
+                                        <Button size="small" onClick={this.handleNext('G')} disabled={this.state.activeStep2 === this.state.totalpage2}>
                                             Next
                                             <KeyboardArrowRight />
                                         </Button>
                                     }
                                     backButton={
-                                        <Button size="small" onClick={this.handleBack('S')} disabled={this.state.activeStep2 === 0}>
+                                        <Button size="small" onClick={this.handleBack('G')} disabled={this.state.activeStep2 === 0}>
+                                            <KeyboardArrowLeft />
+                                            Back
+                                        </Button>
+                                    }
+                                />
+                            </Collapse>
+
+                            <ListItem button onClick={this.handleClick_1}>
+                                <ListItemText inset primary="StackOverflow" />
+                                {this.state.open_list_1 ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                            <Collapse in={this.state.open_list_1 && this.state.open_drawer} timeout="auto" unmountOnExit>
+                                <StackOverflow setValue={this.setValue} pagevalue = {this.state.activeStep1} setPage = {this.setPage}/>
+                                <MobileStepper
+                                    variant="progress"
+                                    steps={this.state.totalpage1}
+                                    position="static"
+                                    activeStep={this.state.activeStep1}
+                                    className={classes.root}
+                                    nextButton={
+                                        <Button size="small" onClick={this.handleNext('S')} disabled={this.state.activeStep1 === this.state.totalpage1}>
+                                            Next
+                                            <KeyboardArrowRight />
+                                        </Button>
+                                    }
+                                    backButton={
+                                        <Button size="small" onClick={this.handleBack('S')} disabled={this.state.activeStep1 === 0}>
                                             <KeyboardArrowLeft />
                                             Back
                                         </Button>

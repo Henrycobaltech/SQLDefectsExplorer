@@ -20,7 +20,7 @@ class StackOverflow extends Component {
         // while(true) {
         fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
             .then(res => res.json())
-            .then(prs => {this.setState({ques: prs.content});this.props.setPage(prs.content,prs.totolPages)});
+            .then(prs => {this.setState({ques: prs.content});this.props.setPage(prs.content,prs.totalPages,"StackOverFlow")});
         // }
     }
     // handleNext = () => {

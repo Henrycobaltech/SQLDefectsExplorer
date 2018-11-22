@@ -22,7 +22,7 @@ class GitHub extends Component {
 
       fetch(`${apiHost}/api/pull-requests?page_idx=${page}&&page_size=50`)
         .then(res => res.json())
-        .then(prs => {this.setState({ pullRequests: prs.content });this.props.setPage(prs.content,prs.totalPages)});
+        .then(prs => {this.setState({ pullRequests: prs.content });this.props.setPage(prs.content,prs.totalPages,"GitHub")});
 
   }
 
@@ -52,6 +52,7 @@ class GitHub extends Component {
             {
               this.state.pullRequests.map((pr,index) =>
                 <ListItem button key={pr.id} onClick={this.selectPr(pr,index)} >
+
                     {this.select(pr)}
                   <ListItemText primary={pr.title} secondary={pr.repoName} />
                 </ListItem>
