@@ -33,7 +33,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import marked from 'marked';
 const drawerWidth = 350;
-const isDebug = false;
+const isDebug = true;
 
 const apiHost = isDebug?"http://localhost:8080":"";
 const styles = theme => ({
@@ -113,7 +113,7 @@ const styles = theme => ({
     },
 });
 
-const initialType = {'Crash':false,'Performance':false,'Memory Leak':false,'Security':false};
+const initialType = {'Crash':false,'Low model performance':false,'Not converge':false,'Slow execution':false,'Security':false,'Unknown':false};
 class Dashboard extends React.Component {
     state = {
         open_drawer: false,
@@ -171,11 +171,8 @@ class Dashboard extends React.Component {
     handleChange = (name)  => {
         var l = this.state.selected_types;
         l.push(name)
-        var s = this.state.types_status;
-        s[name] = !s[name]
         this.setState(state => ({
             selected_types: l,
-            types_status: s
         }));
     };
 
@@ -257,7 +254,6 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
                         currentindex2: state.currentindex2 + 1,
-                        types_status: initialType,
                         selected_types:[]
                     }));
                 }else{
@@ -266,7 +262,7 @@ class Dashboard extends React.Component {
 
                     fetch(`${apiHost}/api/pull-requests?page_idx=${page}&page_size=50`)
                         .then(res => res.json())
-                        .then(prs => {this.setState({currentcontent2: prs.content, totalpage2:prs.totalPages, activeStep2:page, currentindex2: 0, show_content: prs.content[0]});});
+                        .then(prs => {this.setState({selected_types:[],currentcontent2: prs.content, totalpage2:prs.totalPages, activeStep2:page, currentindex2: 0, show_content: prs.content[0]});});
                 }
             } else {
                 var i = this.state.currentindex1;
@@ -274,7 +270,6 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent1[i + 1],
                         currentindex1: state.currentindex1 + 1,
-                        types_status: initialType,
                         selected_types:[]
                     }));
                 }else{
@@ -282,10 +277,9 @@ class Dashboard extends React.Component {
                     var page = this.state.activeStep1+1;
                     fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
                         .then(res => res.json())
-                        .then(prs => {this.setState({currentcontent1: prs.content, totalpage1:prs.totalPages, activeStep1:page, currentindex1: 0, show_content: prs.content[0]});});
+                        .then(prs => {this.setState({selected_types:[],currentcontent1: prs.content, totalpage1:prs.totalPages, activeStep1:page, currentindex1: 0, show_content: prs.content[0]});});
                 }
             }
-
     }
 
     showContent = (content,source,classes) => {
@@ -303,14 +297,15 @@ class Dashboard extends React.Component {
                         Repo: {content.repoName}
                     </Typography>
                     <FormGroup row>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Memory Leak']} onChange={()=>this.handleChange('Memory Leak')} />} label="Memory Leak" />
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Security']} onChange={()=>this.handleChange('Security')} />} label="Security" />
-
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Crash')!==-1} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Low model performance')!==-1} onChange={()=>this.handleChange('Low model performance')}/>} label="Low model performance"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Not converge')!==-1} onChange={()=>this.handleChange('Not converge')} />} label="Not converge" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Slow execution')!==-1} onChange={()=>this.handleChange('Slow execution')} />} label="Slow execution" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Security')!==-1} onChange={()=>this.handleChange('Security')} />} label="Security" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Unknown')!==-1} onChange={()=>this.handleChange('Unknown')} />} label="Unknown" />
                     </FormGroup>
                     <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content.id,'GitHub')}>
-                        Useless
+                        Noise
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content.id,'GitHub')}>
@@ -355,13 +350,15 @@ class Dashboard extends React.Component {
                         Title: {content.title}
                     </Typography>
                     <FormGroup row>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Crash']} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Performance']} onChange={()=>this.handleChange('Performance')}/>} label="Performance"/>
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Memory Leak']} onChange={()=>this.handleChange('Memory Leak')} />} label="Memory Leak" />
-                        <FormControlLabel control={<Checkbox checked = {this.state.types_status['Security']} onChange={()=>this.handleChange('Security')} />} label="Security" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Crash')!==-1} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Low model performance')!==-1} onChange={()=>this.handleChange('Low model performance')}/>} label="Low model performance"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Not converge')!==-1} onChange={()=>this.handleChange('Not converge')} />} label="Not converge" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Slow execution')!==-1} onChange={()=>this.handleChange('Slow execution')} />} label="Slow execution" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Security')!==-1} onChange={()=>this.handleChange('Security')} />} label="Security" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Unknown')!==-1} onChange={()=>this.handleChange('Unknown')} />} label="Unknown" />
                     </FormGroup>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content.id,'StackOverflow')}>
-                        Useless
+                        Noise
                         <DeleteIcon className={classes.rightIcon} />
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content.id,'StackOverflow')}>

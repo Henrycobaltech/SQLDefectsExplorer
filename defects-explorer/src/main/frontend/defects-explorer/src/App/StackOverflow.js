@@ -4,7 +4,7 @@ import './GitHub.css';
 import ListItemIcon from "@material-ui/core/ListItemIcon/ListItemIcon";
 import StarIcon from '@material-ui/icons/Star';
 
-const isDebug = false;
+const isDebug = true;
 
 const apiHost = isDebug?"http://localhost:8080":"";
 
