@@ -23,7 +23,6 @@ import classNames from 'classnames';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import DeleteIcon from '@material-ui/icons/Delete';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import StackOverflow from './StackOverflow'
@@ -33,7 +32,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import marked from 'marked';
 const drawerWidth = 350;
-const isDebug = false;
+const isDebug = true;
 
 const apiHost = isDebug?"http://localhost:8080":"";
 const styles = theme => ({
@@ -152,9 +151,9 @@ class Dashboard extends React.Component {
 
     setValue = (value,resource,index) => {//stackoverflow
         if (resource=="GitHub"){
-            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex2:index,selected_types:[],types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}}));
+            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex2:index,selected_types:value['categories'].slice()}));
         }else{
-            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex1:index,selected_types:[],types_status:{'Crash':false,'Performance':false,'Memory Leak':false,'Security':false}}));
+            this.setState(state => ({ show_resource: resource ,show_content: value ,currentindex1:index,selected_types:value['categories'].slice()}));
         }
             this.forceUpdate();
     }
@@ -170,32 +169,22 @@ class Dashboard extends React.Component {
 
     handleChange = (name)  => {
         var l = this.state.selected_types;
-        l.push(name)
+        var t = l.indexOf(name)
+        console.log(t )
+        if (t!==-1){
+            l.splice(t,1)
+            console.log(l)
+        }
+        else{
+            l.push(name)
+        }
         this.setState(state => ({
             selected_types: l,
         }));
+
     };
 
-    handleDelete = (id,source) =>{
 
-        if(source==='GitHub')
-            var url = `${apiHost}/api/pull-requests/${id}/categories`
-        else
-            var url = `${apiHost}/api/so-qa-pages/${id}/categories`
-
-        const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(['delete']), headers:{
-                'Content-Type': 'application/json'
-            }});
-
-        fetch(myRequest)
-            .then(response => {
-            if (response.status === 201) {
-                alert("Delete Sucessfully")
-            } else {
-                alert("Can't delete , server error")
-            }
-        })
-    }
 
     handleNext = (source) => {
         return () =>{if(source=='G') {
@@ -229,10 +218,22 @@ class Dashboard extends React.Component {
 
     handleSave= (id,source) =>{
         let type=this.state.selected_types;
-        if(source==='GitHub')
+        if(source==='GitHub') {
             var url = `${apiHost}/api/pull-requests/${id}/categories`
-        else
+            var s = this.state.currentcontent2
+            var t = this.state.currentindex2
+            s[t]['categories'] = type
+            console.log(s[t])
+            this.setState(state=>({currentcontent2:s}))
+        }
+        else{
             var url = `${apiHost}/api/so-qa-pages/${id}/categories`
+            var s = this.state.currentcontent1
+            var t = this.state.currentindex1
+            s[t]['categories'] = type
+            this.setState(state=>({currentcontent1:s}))
+
+        }
         const myRequest = new Request(url, {method: 'PUT',body:JSON.stringify(type), headers:{
             'Content-Type': 'application/json'
             }});
@@ -245,6 +246,7 @@ class Dashboard extends React.Component {
                     alert("Can't save , server error")
                 }
             })
+        this.forceUpdate()
     }
 
     handleNextitem = (source)=>{
@@ -254,15 +256,27 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent2[i + 1],
                         currentindex2: state.currentindex2 + 1,
-                        selected_types:[]
+                        selected_types: state.currentcontent2[i+1]['categories'].slice()
                     }));
+                    console.log(this.state.currentcontent2[i+1]['categories'])
                 }else{
-                    var apiHost = isDebug?"http://localhost:8080":"";
-                    var page = this.state.activeStep2+1;
+                    if (this.state.activeStep2<this.state.totalpage2) {
+                        var apiHost = isDebug ? "http://localhost:8080" : "";
+                        var page = this.state.activeStep2 + 1;
 
-                    fetch(`${apiHost}/api/pull-requests?page_idx=${page}&page_size=50`)
-                        .then(res => res.json())
-                        .then(prs => {this.setState({selected_types:[],currentcontent2: prs.content, totalpage2:prs.totalPages, activeStep2:page, currentindex2: 0, show_content: prs.content[0]});});
+                        fetch(`${apiHost}/api/pull-requests?page_idx=${page}&page_size=50`)
+                            .then(res => res.json())
+                            .then(prs => {
+                                this.setState({
+                                    selected_types: prs.content[0]['categories'].slice(),
+                                    currentcontent2: prs.content,
+                                    totalpage2: prs.totalPages,
+                                    activeStep2: page,
+                                    currentindex2: 0,
+                                    show_content: prs.content[0]
+                                });
+                            });
+                    }
                 }
             } else {
                 var i = this.state.currentindex1;
@@ -270,16 +284,83 @@ class Dashboard extends React.Component {
                     this.setState(state => ({
                         show_content: state.currentcontent1[i + 1],
                         currentindex1: state.currentindex1 + 1,
-                        selected_types:[]
+                        selected_types:state.currentcontent1[i + 1]['categories'].slice()
                     }));
                 }else{
-                    var apiHost = isDebug?"http://localhost:8080":"";
-                    var page = this.state.activeStep1+1;
-                    fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
-                        .then(res => res.json())
-                        .then(prs => {this.setState({selected_types:[],currentcontent1: prs.content, totalpage1:prs.totalPages, activeStep1:page, currentindex1: 0, show_content: prs.content[0]});});
+                    if (this.state.activeStep1<this.state.totalpage1) {
+                        var apiHost = isDebug ? "http://localhost:8080" : "";
+                        var page = this.state.activeStep1 + 1;
+                        fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
+                            .then(res => res.json())
+                            .then(prs => {
+                                this.setState({
+                                    selected_types:prs.content[0]['categories'].slice() ,
+                                    currentcontent1: prs.content,
+                                    totalpage1: prs.totalPages,
+                                    activeStep1: page,
+                                    currentindex1: 0,
+                                    show_content: prs.content[0]
+                                });
+                            });
+                    }
                 }
             }
+    }
+    handleLastitem = (source)=>{
+        if (source === "GitHub") {
+            var i = this.state.currentindex2;
+            if(i > 0) {
+                this.setState(state => ({
+                    show_content: state.currentcontent2[i - 1],
+                    currentindex2: state.currentindex2 - 1,
+                    selected_types:state.currentcontent2[i - 1]['categories'].slice()
+                }));
+            }else{
+                if(this.state.activeStep2>0) {
+                    var apiHost = isDebug ? "http://localhost:8080" : "";
+                    var page = this.state.activeStep2 - 1;
+
+                    fetch(`${apiHost}/api/pull-requests?page_idx=${page}&page_size=50`)
+                        .then(res => res.json())
+                        .then(prs => {
+                            this.setState({
+                                selected_types: prs.content[49]['categories'].slice(),
+                                currentcontent2: prs.content,
+                                totalpage2: prs.totalPages,
+                                activeStep2: page,
+                                currentindex2: 49,
+                                show_content: prs.content[49]
+                            });
+                        });
+                }
+            }
+        } else {
+            var i = this.state.currentindex1;
+            if(i >0) {
+                this.setState(state => ({
+                    show_content: state.currentcontent1[i - 1],
+                    currentindex1: state.currentindex1 - 1,
+                    selected_types:state.currentcontent1[i - 1]['categories'].slice()
+                }));
+            }else{
+                if(this.state.activeStep1>0) {
+                    var apiHost = isDebug ? "http://localhost:8080" : "";
+                    var page = this.state.activeStep1 - 1;
+                    fetch(`${apiHost}/api/so-qa-pages?page_idx=${page}&page_size=50`)
+                        .then(res => res.json())
+                        .then(prs => {
+                            this.setState({
+                                selected_types: prs.content[49]['categories'].slice(),
+                                currentcontent1: prs.content,
+                                totalpage1: prs.totalPages,
+                                activeStep1: page,
+                                currentindex1: 49,
+                                show_content: prs.content[49]
+                            });
+                        });
+                }
+            }
+        }
     }
 
     showContent = (content,source,classes) => {
@@ -297,16 +378,17 @@ class Dashboard extends React.Component {
                         Repo: {content.repoName}
                     </Typography>
                     <FormGroup row>
-                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Crash')!==-1} onChange={()=>this.handleChange('Crash')}/>} label="Crash"/>
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Crash')!==-1} onClick={()=>this.handleChange('Crash')}/>} label="Crash"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Low model performance')!==-1} onChange={()=>this.handleChange('Low model performance')}/>} label="Low model performance"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Not converge')!==-1} onChange={()=>this.handleChange('Not converge')} />} label="Not converge" />
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Slow execution')!==-1} onChange={()=>this.handleChange('Slow execution')} />} label="Slow execution" />
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Security')!==-1} onChange={()=>this.handleChange('Security')} />} label="Security" />
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Unknown')!==-1} onChange={()=>this.handleChange('Unknown')} />} label="Unknown" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Noise')!==-1} onChange={()=>this.handleChange('Noise')} />} label="Noise" />
                     </FormGroup>
-                    <Button variant="contained"  className={classes.button} onClick = {() => this.handleDelete(content.id,'GitHub')}>
-                        Noise
-                        <DeleteIcon className={classes.rightIcon} />
+
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() => this.handleLastitem('GitHub')}>
+                        Last
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() => this.handleSave(content.id,'GitHub')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
@@ -356,10 +438,11 @@ class Dashboard extends React.Component {
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Slow execution')!==-1} onChange={()=>this.handleChange('Slow execution')} />} label="Slow execution" />
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Security')!==-1} onChange={()=>this.handleChange('Security')} />} label="Security" />
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Unknown')!==-1} onChange={()=>this.handleChange('Unknown')} />} label="Unknown" />
+                        <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Noise')!==-1} onChange={()=>this.handleChange('Noise')} />} label="Noise" />
                     </FormGroup>
-                    <Button variant="contained"  className={classes.button} onClick = {() =>this.handleDelete(content.id,'StackOverflow')}>
-                        Noise
-                        <DeleteIcon className={classes.rightIcon} />
+
+                    <Button variant="contained"  size = "large"className={classes.button} onClick = {() => this.handleLastitem('StackOverflow')}>
+                        Last
                     </Button>
                     <Button variant="contained"  className={classes.button} onClick = {() =>this.handleSave(content.id,'StackOverflow')}>
                         <SaveIcon className={classNames(classes.rightIcon, classes.iconSmall)} />
