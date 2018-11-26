@@ -32,7 +32,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import marked from 'marked';
 const drawerWidth = 350;
-const isDebug = true;
+const isDebug = false;
 
 const apiHost = isDebug?"http://localhost:8080":"";
 const styles = theme => ({
