@@ -377,6 +377,9 @@ class Dashboard extends React.Component {
                     <Typography variant="h6" gutterBottom >
                         Repo: {content.repoName}
                     </Typography>
+                    <Typography variant="h6" gutterBottom >
+                        Is Merged: {content.merged ? "Yes":"No"}
+                    </Typography>
                     <FormGroup row>
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Crash')!==-1} onClick={()=>this.handleChange('Crash')}/>} label="Crash"/>
                         <FormControlLabel control={<Checkbox checked = {this.state.selected_types.indexOf('Low model performance')!==-1} onChange={()=>this.handleChange('Low model performance')}/>} label="Low model performance"/>
